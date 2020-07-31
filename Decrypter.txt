@@ -1,0 +1,131 @@
+// C++ code to implement Vigenere Cipher
+#include<bits/stdc++.h>
+using namespace std;
+
+ifstream f("date.in");
+ofstream g("date.out");
+
+string generateKey(string str, string key)
+{
+    for (unsigned int i = 0; i < key.size(); ++i) {
+        key[i] = 'A' + key[i] - '0'+ 11;
+    }
+
+    int x = str.size();
+
+    int i = 0;
+    while (key.size() != str.size())
+    {
+        if (x == i)
+            i = 0;
+        key.push_back(key[i]);
+        ++i;
+    }
+    return key;
+}
+
+//decrypts code
+string originalText(string cipher_text, string key)
+{
+    string orig_text;
+
+    for (int i = 0 ; i < cipher_text.size(); i++)
+    {
+        // converting in range 0-25
+        char x = (cipher_text[i] - key[i] + 26) %26;
+
+        // convert into digits
+        x += 'A';
+        orig_text.push_back(x);
+    }
+    return orig_text;
+}
+
+//Checks validity of cipher and shows initial values
+void revert(string str)
+{
+    string points, key;
+    int sizePoints;
+    bool isRight = false;
+
+    for (unsigned int i = 0; i < str.size(); ++i) {
+        str[i] = str[i] - 'A' + '0' - 11;
+    }
+
+    if (str.size() == 9) {
+        isRight = true;
+        sizePoints = 1;
+
+        char check = str[1];
+        for (int i = 3; i <= 7; i += 2) {
+            if (str[i] != check) {
+                isRight = false;
+            }
+        }
+        points = '0';
+    }
+    else if (str.size() == 13) {
+        isRight = true;
+        sizePoints = 2;
+
+        char check = str[1];
+        for (int i = 4; i <= 8; i += 3) {
+            if (str[i] != check) {
+                isRight = false;
+            }
+        }
+
+        check = str[2];
+        for (int i = 5; i <= 11; i += 3) {
+            if (str[i] != check) {
+                isRight = false;
+            }
+        }
+
+        points = str[1];
+        points += str[2];
+    }
+    else if (str.size() == 17) {
+        isRight = true;
+        sizePoints = 3;
+
+        char check = str[1];
+        for (int i = 5; i <= 13; i += 4) {
+            if (str[i] != check) {
+                isRight = false;
+            }
+        }
+
+        check = str[2];
+        for (int i = 2; i <= 14; i += 4) {
+            if (str[i] != check && str[i + 1] != check) {
+                isRight = false;
+            }
+        }
+
+        points = "100";
+    }
+
+
+    if (isRight) {
+        for (int i = 0; i < str.size(); i += sizePoints + 1)
+            key = key + str[i];
+        g << "Points: " << points << "\n";
+        g << "Key: " << key << "\n";
+    }
+    else {
+        g << "Incorrect format";
+    }
+}
+
+int main()
+{
+    string str, key;
+    f >> str >> key;
+
+    key = generateKey(str, key);
+    str = originalText(str, key);
+
+    revert(str);
+    return 0;
+}
